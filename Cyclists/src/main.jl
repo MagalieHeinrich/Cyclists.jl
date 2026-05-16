@@ -1,5 +1,6 @@
 using DifferentialEquations
 using OrdinaryDiffEq
+using OrdinaryDiffEqSSPRK
 using Plots
 using Random
 
@@ -13,18 +14,51 @@ Random.seed!(mein_seed)
 
 tspan = (0.0, 300.0)      
 x0 = collect(n:-1:1) .* 1.5  
-v0 = fill(30.0/3.6, n)        
+v0 = fill(30.0/3.6, n) 
+print(v0[1])       
 u0 = vcat(x0, v0)         
 
-simulation_params = (
-    riders    = profil_professionals(n), 
-    v_basis   = 3.0,      
-    amplitude = 10.0,     
-    period    = 20.0     
-)
+# simulation_params = (
+#     riders    = profil_professionals(n), 
+#     v_basis   = 3.0,      
+#     amplitude = 10.0,     
+#     period    = 20.0     
+# )
+
+WIND_MODUS = :ou  # Switch between :sine and :ou
+
+
+local simulation_params 
+
+if WIND_MODUS == :sine
+    simulation_params = (
+        riders    = profil_novices(n), 
+        v_basis   = 3.0,      
+        amplitude = 10.0,     
+        period    = 20.0,
+        t_steps   = [0.0],    
+        wind_profile = [0.0], 
+        v_leader_target = v0[1] 
+    )
+
+elseif WIND_MODUS == :ou
+    println("-> Pre-generating stochastic OU wind via Euler-Maruyama...")
+    # Generate the grid with dt=0.1 seconds
+    t_steps, wind_profile = generate_ou_wind(tspan, 0.1, v_basis=3.0, theta=0.3, sigma=2.0)
+    
+    simulation_params = (
+        riders       = profil_novices(n),
+        t_steps      = t_steps,
+        wind_profile = wind_profile,
+        v_basis      = 3.0,      
+        amplitude    = 0.0,   
+        period       = 1.0,   
+        v_leader_target = v0[1]     
+    )
+end
 
 prob = ODEProblem(cyclists!, u0, tspan, simulation_params)
-sol = solve(prob, Tsit5(), reltol=1e-5, abstol=1e-7)
+sol = solve(prob, SSPRK43(), reltol=1e-5, abstol=1e-7)
 
 
 t_vals = sol.t

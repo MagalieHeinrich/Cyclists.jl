@@ -15,8 +15,9 @@
         v_basis   = p_composite.v_basis
         amplitude = p_composite.amplitude
         period    = p_composite.period
-        #t_steps   = p_composite.t_steps
-        #wind_profile = p_composite.wind_profile
+        t_steps   = p_composite.t_steps
+        wind_profile = p_composite.wind_profile
+        v_leader_target = p_composite.v_leader_target
 
         n = Int(length(u)/2)
         x = @view u[1:n]
@@ -32,8 +33,10 @@
     
 
         # Fahrer 1: Leader
+        v_target = v_leader_target
         dx[1] = v[1]
-        dv[1] = 0.0
+        v_leader_eff = max(6.0, v_target - (current_wind * 0.4))
+        dv[1] = 0.5 * (v_leader_eff - v[1])
 
         for i in 2:n
             α, β, d_safe, v_max, s_dur, v_limit = p_list[i-1]
@@ -78,7 +81,10 @@
 
 
     
-    function primitive_cyclists!(du, u, p_list, t)
+    function primitive_cyclists!(du, u, p_composite, t)
+
+        p_list = p_composite.riders
+        
         n = Int(length(u)/2)
         x = @view u[1:n]
         v = @view u[n+1:end]
