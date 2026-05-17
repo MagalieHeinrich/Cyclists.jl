@@ -15,8 +15,8 @@ jobs:
         shell: julia --project=Cyclists {0}
         run: |
           using Pkg
-          # 1. Liest das Project.toml aus und installiert alle Abhängigkeiten automatisch
+          # 1. Installiert alle Abhängigkeiten aus Cyclists/Project.toml
           Pkg.instantiate()
           
-          # 2. Startet direkt die Tests für das aktuelle Projekt
-          Pkg.test()
+          # 2. Führt Testdatei aus
+          include("Cyclists/runtests.jl")
