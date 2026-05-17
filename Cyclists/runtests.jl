@@ -4,9 +4,9 @@ using OrdinaryDiffEq
 using OrdinaryDiffEqSSPRK
 using Random
 
-include("src/profiles.jl")
-include("src/wind.jl")
-include("src/cyclists.jl")
+include(joinpath(@__DIR__, "src", "Profiles.jl"))
+include(joinpath(@__DIR__, "src", "Wind.jl"))
+include(joinpath(@__DIR__, "src", "Cyclists.jl"))
 
 # @testset "Peloton Physics Constraints" begin
 #     n = 5                     
