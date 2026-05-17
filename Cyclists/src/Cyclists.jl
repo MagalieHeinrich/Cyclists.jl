@@ -45,10 +45,18 @@
             angleichung = α * (v[i-1] - v[i]) 
             abstandskontrolle = β * (dist - d_safe) 
             
-            panic_threshold = 0.15 
-            safe_delta = clamp(panic_threshold - dist, 0.0, 0.25)
-            angst_bremse = dist < panic_threshold ? exp(5.0 * safe_delta) : 0.0 
-            angst_bremse = min(angst_bremse, 100.0)
+            # panic_threshold = 0.15 #this block fails the nonnegativity check
+            # safe_delta = clamp(panic_threshold - dist, 0.0, 0.25)
+            # angst_bremse = dist < panic_threshold ? exp(5.0 * safe_delta) : 0.0 
+            
+            if dist < d_safe
+                # Progressive Bremskraft: Je näher an Null, desto rabiater der Wert
+                angst_bremse = 1.5 / (dist + 0.01)^2
+            else
+                angst_bremse = 0.0
+            end
+
+            angst_bremse = min(angst_bremse, 150.0)
 
             desired_dv = angleichung + abstandskontrolle - angst_bremse
             
@@ -64,9 +72,15 @@
             # Once stamina is depleted (time is up), the rider drops to their limit.
             v_eff = (t > s_dur) ? v_limit : v_eff_max
 
-            if v[i] >= v_eff && desired_dv > 0
-                dv[i] = 0.0
-            elseif v[i] <= 0.0 && desired_dv < 0
+            if desired_dv > 0
+                # Je dichter v[i] an v_eff herankommt, desto mehr wird die Beschleunigung abgewürgt.
+                # Wenn v[i] == v_eff, wird der Skalierungsfaktor 0.0.
+                factor = max(0.0, 1.0 - (v[i] / v_eff))^2
+                desired_dv = desired_dv * factor
+            end
+
+            # Harte Sicherheitsgrenzen für die Ableitungen setzen
+            if v[i] <= 0.0 && desired_dv < 0
                 dv[i] = 0.0
             else
                 dv[i] = desired_dv
