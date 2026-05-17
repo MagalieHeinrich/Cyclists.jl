@@ -1,17 +1,23 @@
 name: Run Physics Tests
-on: [push, pull_request] 
+on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1.11'
-      - name: Run Tests
+          
+      - name: Install Dependencies and Run Tests
         shell: julia --project=Cyclists {0}
         run: |
           using Pkg
+          # 1. Erst die externen Pakete in der Testumgebung installieren
+          Pkg.add(["DifferentialEquations", "OrdinaryDiffEq", "OrdinaryDiffEqSSPRK", "Random"])
+          
+          # 2. Dann dein eigenes Projekt verknüpfen und testen
           Pkg.develop(PackageSpec(path="Cyclists"))
           Pkg.test("Cyclists")
