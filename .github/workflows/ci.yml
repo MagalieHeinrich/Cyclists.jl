@@ -1,0 +1,17 @@
+name: Run Physics Tests
+on: [push, pull_request] 
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.11'
+      - name: Run Tests
+        shell: julia --project=Cyclists {0}
+        run: |
+          using Pkg
+          Pkg.develop(PackageSpec(path="Cyclists"))
+          Pkg.test("Cyclists")
