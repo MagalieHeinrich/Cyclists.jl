@@ -19,4 +19,4 @@ jobs:
           Pkg.instantiate()
           
           # 2. Führt deine Testdatei direkt im aktuellen Ordner aus
-          include("runtests.jl") 
+          include(joinpath(pwd(), "Cyclists", "runtests.jl"))
