@@ -6,9 +6,9 @@ using OrdinaryDiffEqSSPRK
 using Random
 
 
-include("profiles.jl")
-include("wind.jl")
-include("physics.jl") 
+include("Profiles.jl")
+include("Wind.jl")
+include("Physics.jl") 
 
 
 export cyclists!, create_simulation_params
