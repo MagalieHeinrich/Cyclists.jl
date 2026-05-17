@@ -15,9 +15,8 @@ jobs:
         shell: julia --project=Cyclists {0}
         run: |
           using Pkg
-          # 1. Erst die externen Pakete in der Testumgebung installieren
-          Pkg.add(["DifferentialEquations", "OrdinaryDiffEq", "OrdinaryDiffEqSSPRK", "Random"])
+          # 1. Liest das Project.toml aus und installiert alle Abhängigkeiten automatisch
+          Pkg.instantiate()
           
-          # 2. Dann dein eigenes Projekt verknüpfen und testen
-          Pkg.develop(PackageSpec(path="Cyclists"))
-          Pkg.test("Cyclists")
+          # 2. Startet direkt die Tests für das aktuelle Projekt
+          Pkg.test()
