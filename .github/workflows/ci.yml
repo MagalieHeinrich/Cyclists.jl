@@ -7,16 +7,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/setup-julia@v2
         with:
           version: '1.11'
           
-      - name: Install Dependencies and Run Tests
-        shell: julia --project=Cyclists {0}
-        run: |
-          using Pkg
-          # 1. Installiert alle Abhängigkeiten
-          Pkg.instantiate()
-          
-          # 2. Führt deine Testdatei direkt im aktuellen Ordner aus
-          include(joinpath(pwd(), "Cyclists", "runtests.jl"))
+      - uses: julia-actions/julia-buildpkg@v1
+      
+      - uses: julia-actions/julia-runtest@v1

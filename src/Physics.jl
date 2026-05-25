@@ -45,10 +45,16 @@
             angleichung = α * (v[i-1] - v[i]) 
             abstandskontrolle = β * (dist - d_safe) 
             
-            panic_threshold = 0.15 
+            panic_threshold = 1.0 
             safe_delta = clamp(panic_threshold - dist, 0.0, 0.25)
-            angst_bremse = dist < panic_threshold ? exp(5.0 * safe_delta) : 0.0 
-            angst_bremse = min(angst_bremse, 100.0)
+            #angst_bremse = dist < panic_threshold ? exp(5.0 * safe_delta) : 0.0 
+            if dist < panic_threshold
+            # As dist approaches 0 (or goes negative), this number blows up aggressively
+                angst_bremse = exp(4.0 * (panic_threshold - dist)) 
+            else
+                angst_bremse = 0.0
+            end
+            angst_bremse = min(angst_bremse, 150.0)
 
             desired_dv = angleichung + abstandskontrolle - angst_bremse
             
@@ -64,13 +70,22 @@
             # Once stamina is depleted (time is up), the rider drops to their limit.
             v_eff = (t > s_dur) ? v_limit : v_eff_max
 
-            if v[i] >= v_eff && desired_dv > 0
-                dv[i] = 0.0
+            dv[i] = desired_dv
+
+            if v[i] > v_eff
+                # Strong restorative acceleration to pull them back to their biological limit
+                dv[i] = min(desired_dv, 2.0 * (v_eff - v[i])) 
             elseif v[i] <= 0.0 && desired_dv < 0
                 dv[i] = 0.0
-            else
-                dv[i] = desired_dv
             end
+
+            # if v[i] >= v_eff && desired_dv > 0
+            #     dv[i] = 0.0
+            # elseif v[i] <= 0.0 && desired_dv < 0
+            #     dv[i] = 0.0
+            # else
+            #     dv[i] = desired_dv
+            # end
             dx[i] = max(0.0, v[i])
 
             if v[i] > 30.0 
