@@ -14,3 +14,7 @@ To initialize the environment and launch the package locally, open the Julia REP
 using Pkg
 Pkg.activate(".")
 Pkg.instantiate()
+
+## Overview
+
+The pluto notebook cyclists_pluto.jl presents the functionality of Cyclists.jl.
