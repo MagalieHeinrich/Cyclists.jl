@@ -7,6 +7,10 @@ A Julia-based ODE simulation of cycling peloton dynamics: Modeling velocity sync
 * **`src/Wind.jl`**: Simulates deterministic perturbations (Sinusoidal waves) and stochastic weather models (Ornstein-Uhlenbeck processes evaluated via Euler-Maruyama approximations).
 * **Reproducibility**: Environment tracking managed natively via tracked `Project.toml`.
 
+## Overview
+
+The pluto notebook cyclists_pluto.jl presents the functionality of Cyclists.jl.
+
 ## Getting Started
 To initialize the environment and launch the package locally, open the Julia REPL within the project directory and run:
 
@@ -15,6 +19,4 @@ using Pkg
 Pkg.activate(".")
 Pkg.instantiate()
 ```
-## Overview
 
-The pluto notebook cyclists_pluto.jl presents the functionality of Cyclists.jl.
